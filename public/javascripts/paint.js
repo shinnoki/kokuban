@@ -24,19 +24,40 @@ $(function() {
   $('#myCanvas').mousedown(function(e) {
     drawFlag = true;
     old = {'x': e.clientX, 'y': e.clientY};
-  });
-
-  $(document).mouseup(function() {
-    drawFlag = false;
-  });
-
-  $('#myCanvas').mousemove(function(e) {
+  }).mousemove(function(e) {
     if (!drawFlag) return;
     var cur = {'x': e.clientX, 'y': e.clientY};
     var p = {'from': old, 'to': cur, 'life': maxLife, 'color': color};
     paths.push(p);
     socket.json.emit('msg send', p);
     old = cur;
+  });
+  
+  $(document).mouseup(function() {
+    drawFlag = false;
+  });
+
+
+  $('#myCanvas').bind({
+    'touchstart': function(e) {
+      e.preventDefault();
+      drawFlag = true;
+      old = {'x': e.changedTouches[0].pageX, 'y': e.changedTouches[0].pageY};
+    },
+    'touchmove': function(e) {
+      e.preventDefault();
+      if (!drawFlag) return;
+      var cur = {'x': e.changedTouches[0].pageX, 'y': e.changedTouches[0].pageY};
+      var p = {'from': old, 'to': cur, 'life': maxLife, 'color': color};
+      paths.push(p);
+      socket.json.emit('msg send', p);
+      old = cur;
+    }
+  });
+  $(document).bind({
+    'touchend': function() {
+      drawFlag = false;
+    }
   });
 
   var loop = function() {
