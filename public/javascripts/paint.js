@@ -42,7 +42,6 @@ $(function() {
   $('#myCanvas').bind({
     'touchstart': function(e) {
       e.preventDefault();
-      alert('touchstart');
       drawFlag = true;
       old = {'x': e.touches[0].pageX, 'y': e.touches[0].pageY};
     },
@@ -59,7 +58,6 @@ $(function() {
   });
   $(document).bind({
     'touchend': function() {
-      alert('touchend');
       drawFlag = false;
     }
   });
