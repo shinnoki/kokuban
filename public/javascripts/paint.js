@@ -43,13 +43,14 @@ $(function() {
     'touchstart': function(e) {
       e.preventDefault();
       drawFlag = true;
-      old = {'x': e.touches[0].pageX, 'y': e.touches[0].pageY};
+      var t = e.originalEvent.touches[0];
+      old = {'x': t.pageX, 'y': t.pageY};
     },
     'touchmove': function(e) {
       if (!drawFlag) return;
       e.preventDefault();
-      alert('touchmove');
-      var cur = {'x': e.touches[0].pageX, 'y': e.touches[0].pageY};
+      var t = e.originalEvent.touches[0];
+      var cur = {'x': t.pageX, 'y': t.pageY};
       var p = {'from': old, 'to': cur, 'life': maxLife, 'color': color};
       paths.push(p);
       socket.json.emit('msg send', p);
