@@ -23,10 +23,10 @@ $(function() {
   
   $('#myCanvas').mousedown(function(e) {
     drawFlag = true;
-    old = {'x': e.clientX, 'y': e.clientY};
+    old = {'x': e.pageX, 'y': e.pageY};
   }).mousemove(function(e) {
     if (!drawFlag) return;
-    var cur = {'x': e.clientX, 'y': e.clientY};
+    var cur = {'x': e.pageX, 'y': e.pageY};
     var p = {'from': old, 'to': cur, 'life': maxLife, 'color': color};
     paths.push(p);
     socket.json.emit('msg send', p);
@@ -38,16 +38,17 @@ $(function() {
   });
 
 
+  // ipad用
   $('#myCanvas').bind({
     'touchstart': function(e) {
       e.preventDefault();
       drawFlag = true;
-      old = {'x': e.changedTouches[0].pageX, 'y': e.changedTouches[0].pageY};
+      old = {'x': e.touches[0].pageX, 'y': e.touches[0].pageY};
     },
     'touchmove': function(e) {
-      e.preventDefault();
       if (!drawFlag) return;
-      var cur = {'x': e.changedTouches[0].pageX, 'y': e.changedTouches[0].pageY};
+      e.preventDefault();
+      var cur = {'x': e.touches[0].pageX, 'y': e.touches[0].pageY};
       var p = {'from': old, 'to': cur, 'life': maxLife, 'color': color};
       paths.push(p);
       socket.json.emit('msg send', p);
