@@ -42,12 +42,14 @@ $(function() {
   $('#myCanvas').bind({
     'touchstart': function(e) {
       e.preventDefault();
+      alert('touchstart');
       drawFlag = true;
       old = {'x': e.touches[0].pageX, 'y': e.touches[0].pageY};
     },
     'touchmove': function(e) {
       if (!drawFlag) return;
       e.preventDefault();
+      alert('touchmove');
       var cur = {'x': e.touches[0].pageX, 'y': e.touches[0].pageY};
       var p = {'from': old, 'to': cur, 'life': maxLife, 'color': color};
       paths.push(p);
@@ -57,6 +59,7 @@ $(function() {
   });
   $(document).bind({
     'touchend': function() {
+      alert('touchend');
       drawFlag = false;
     }
   });
