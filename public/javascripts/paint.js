@@ -3,12 +3,15 @@ $(function() {
 
   var canvas = document.getElementById('myCanvas');
   var context = canvas.getContext('2d');
+  context.lineWidth = 5;
+  context.lineCap = "round";
 
   var paths = new Array();
   var drawFlag = false;
   var color = 'white';
   var old = {'x': 0, 'y': 0};
-  const maxLife = 30;
+  const maxLife = 100;
+  const lifeDecay = 0.96;
 
   var timer;
   
@@ -20,25 +23,29 @@ $(function() {
     paths.push(msg);
   });
 
-  
-  $('#myCanvas').mousedown(function(e) {
-    drawFlag = true;
-    old = {'x': e.pageX, 'y': e.pageY};
-  }).mousemove(function(e) {
-    if (!drawFlag) return;
-    var cur = {'x': e.pageX, 'y': e.pageY};
-    var p = {'from': old, 'to': cur, 'life': maxLife, 'color': color};
-    paths.push(p);
-    socket.json.emit('msg send', p);
-    old = cur;
+
+  // PC用
+  $('#myCanvas').bind({
+    'mousedown': function(e) {
+      drawFlag = true;
+      old = {'x': e.pageX, 'y': e.pageY};
+    },
+    'mousemove': function(e) {
+      if (!drawFlag) return;
+      var cur = {'x': e.pageX, 'y': e.pageY};
+      var p = {'from': old, 'to': cur, 'life': maxLife, 'color': color};
+      paths.push(p);
+      socket.json.emit('msg send', p);
+      old = cur;
+    }
   });
-  
-  $(document).mouseup(function() {
-    drawFlag = false;
+  $(document).bind({
+    'mouseup' : function() {
+      drawFlag = false;
+    }
   });
 
-
-  // ipad用
+  // iPad用
   $('#myCanvas').bind({
     'touchstart': function(e) {
       e.preventDefault();
@@ -74,18 +81,27 @@ $(function() {
     while (i < paths.length) {
       var p = paths[i];
       
+      // 消しゴム
+      // 重なりが汚くなるのを防ぐため
+      context.beginPath();
+      context.globalCompositeOperation = 'destination-out';
+      context.globalAlpha = 1;
+      context.moveTo(p.from.x, p.from.y);
+      context.lineTo(p.to.x, p.to.y);
+      context.stroke();
+      
       // pathを描く
       context.beginPath();
+      context.globalCompositeOperation = 'source-over';
       context.globalAlpha = p.life / maxLife;
       context.strokeStyle = p.color;
-      context.lineWidth = 5;
       context.moveTo(p.from.x, p.from.y);
       context.lineTo(p.to.x, p.to.y);
       context.stroke();
 
       // lifeを更新
-      p.life--;
-      if (p.life <= 0) {
+      p.life *= lifeDecay;
+      if (p.life <= 1) {
         // lifeが0だったら要素を消す
         paths.splice(i,1);
       } else {
@@ -98,6 +114,7 @@ $(function() {
     // 更新
     context.restore();
 
+    // 10FPS
     clearTimeout(timer);
     timer = setTimeout(loop,100);
   };

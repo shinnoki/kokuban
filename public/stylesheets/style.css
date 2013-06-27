@@ -9,3 +9,8 @@ body {
   height: 480px;
   border: solid 5px saddlebrown;
   background-color: darkgreen;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
