@@ -33,13 +33,18 @@ app.get('/users', user.list);
 var server = http.createServer(app);
 
 // socket.io
-var socket = require('socket.io').listen(server);
+var io = require('socket.io');
+var socket = io.listen(server);
+socket.configure(function() {
+  socket.set("transports", ["xhr-polling"]);
+  socket.set("polling duration", 10);
+});
 var colors = ['white','yellow','deeppink'];
 var count = 0;
 socket.on('connection', function(client) {
   // connected
   count++;
-  client.emit('connected', colors[count%colors.length];
+  client.emit('connected', colors[count%colors.length]);
   client.on('msg send', function(msg) {
     // message
     console.log(msg);

@@ -34,6 +34,10 @@ var server = http.createServer(app);
 
 // socket.io
 var socket = require('socket.io').listen(server);
+socket.configure(function() {
+  socket.set("transports", ["xhr-polling"]);
+  socket.set("polling duration", 10);
+});
 var colors = ['white','yellow','deeppink'];
 var count = 0;
 socket.on('connection', function(client) {
